@@ -48,6 +48,8 @@ func commandHelp(cfg *config, args []string) error {
 	fmt.Println("mapb: Displays the names of the previous 20 location areas in the Pokemon world")
 	fmt.Println("explore <location area>: Displays the pokemon that can be found in a given location area")
 	fmt.Println("catch <pokemon>: Attempts to 'catch' a pokemon. Pokemon will be added to pokedex if caught")
+	fmt.Println("inspect <pokemon>: Displays the pokemons stats/data")
+	fmt.Println("pokedex: Displays the list of all the names of the Pokemon the user has caught")
 	fmt.Println()
 	return nil
 }
@@ -131,6 +133,7 @@ func commandCatch(cfg *config, args []string) error {
 	if catchChance >= catchDifficulty {
 		fmt.Printf("%s was caught!\n", args[1])
 		pokedex.pokemon[result.Name] = result
+		fmt.Println("You may now inspect it with the inspect command.")
 	} else {
 		fmt.Printf("%s escaped!\n", args[1])
 	}
@@ -156,6 +159,13 @@ func commandInspect(cfg *config, args []string) error {
 
 	} else {
 		fmt.Println("you have not caught that pokemon")
+	}
+	return nil
+}
+
+func commandPokedex(cfg *config, args []string) error {
+	for pokemonName, _ := range pokedex.pokemon {
+		fmt.Printf(" - %s\n", pokemonName)
 	}
 	return nil
 }
@@ -197,6 +207,11 @@ func main() {
 			name:        "inspect",
 			description: "Displays the details of pokemons stored in pokedex. (caught pokemon)",
 			callback:    commandInspect,
+		},
+		"pokedex": {
+			name:        "pokedex",
+			description: "Displays a list of all the names of the Pokemon the user has caught",
+			callback:    commandPokedex,
 		},
 	}
 
