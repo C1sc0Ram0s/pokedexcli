@@ -138,6 +138,28 @@ func commandCatch(cfg *config, args []string) error {
 	return nil
 }
 
+func commandInspect(cfg *config, args []string) error {
+	if val, exists := pokedex.pokemon[args[1]]; exists {
+		fmt.Printf("Name: %s\nHeight: %d\nWeight: %d\n", val.Name, val.Height, val.Weight)
+
+		fmt.Println("Stats:")
+		for i := 0; i < len(val.Stats); i++ {
+			statName := val.Stats[i].Stat.Name
+			statValue := val.Stats[i].BaseStat
+			fmt.Printf(" - %s: %d\n", statName, statValue)
+		}
+
+		fmt.Println("Types:")
+		for i := 0; i < len(val.Types); i++ {
+			fmt.Printf(" - %s\n", val.Types[i].Type.Name)
+		}
+
+	} else {
+		fmt.Println("you have not caught that pokemon")
+	}
+	return nil
+}
+
 func main() {
 	// CLI Commands
 	commands := map[string]cliCommand{
@@ -170,6 +192,11 @@ func main() {
 			name:        "catch",
 			description: "Attempts to catch a pokemon and adds them to the user Pokedex",
 			callback:    commandCatch,
+		},
+		"inspect": {
+			name:        "inspect",
+			description: "Displays the details of pokemons stored in pokedex. (caught pokemon)",
+			callback:    commandInspect,
 		},
 	}
 
