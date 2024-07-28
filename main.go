@@ -4,11 +4,20 @@ import (
 	"bufio"
 	"errors"
 	"fmt"
+	"math/rand"
 	"os"
 	"strings"
 
 	"github.com/C1sc0Ram0s/pokedexcli/internal/pokeapi"
 )
+
+type Pokedex struct {
+	pokemon map[string]pokeapi.Pokemon
+}
+
+var pokedex = Pokedex{
+	pokemon: make(map[string]pokeapi.Pokemon),
+}
 
 // cliName is the name used in the repl prompts
 var cliName string = "pokedex"
@@ -37,6 +46,8 @@ func commandHelp(cfg *config, args []string) error {
 	fmt.Println("exit: Exit the Pokedex")
 	fmt.Println("map: Displays the names of 20 location areas in the Pokemon world")
 	fmt.Println("mapb: Displays the names of the previous 20 location areas in the Pokemon world")
+	fmt.Println("explore <location area>: Displays the pokemon that can be found in a given location area")
+	fmt.Println("catch <pokemon>: Attempts to 'catch' a pokemon. Pokemon will be added to pokedex if caught")
 	fmt.Println()
 	return nil
 }
@@ -103,7 +114,27 @@ func commandExplore(cfg *config, args []string) error {
 }
 
 func commandCatch(cfg *config, args []string) error {
-	//command := args[0]
+	command := args[0]
+	if len(args) < 1 {
+		return errors.New("invalid number of arguments")
+	}
+	fmt.Printf("Throwing a Pokeball at %s...\n", args[1])
+	result, err := pokeapi.GetPokemon(command, args)
+	if err != nil {
+		fmt.Println("Error: ", err)
+		return nil
+	}
+
+	//Catch Pokemon logic
+	catchChance := rand.Float64() //Pseudo-random float [0.0, 1.0)
+	catchDifficulty := 1.0 * (1.0 - (float64(result.BaseExperience) / 300.0))
+	if catchChance >= catchDifficulty {
+		fmt.Printf("%s was caught!\n", args[1])
+		pokedex.pokemon[result.Name] = result
+	} else {
+		fmt.Printf("%s escaped!\n", args[1])
+	}
+
 	return nil
 }
 
